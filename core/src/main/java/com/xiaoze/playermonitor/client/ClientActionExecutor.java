@@ -5,6 +5,7 @@ import com.xiaoze.playermonitor.network.payload.ScreenshotChunkPayload;
 import com.xiaoze.playermonitor.util.TextUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.Text;
@@ -33,7 +34,7 @@ public final class ClientActionExecutor {
                 case "f3_debug" -> toggleField(client.options, "debugEnabled", "debugHud");
                 case "f3_hitboxes" -> toggleField(client.getEntityRenderDispatcher(), "renderHitboxes");
                 case "f3_chunkborders" -> toggleField(client.debugRenderer, "renderChunkBorder", "showChunkBorder");
-                case "key_simulate" -> simulateKey(client, args);
+                case "key_simulate" -> simulateKey(args);
                 case "show_message" -> showMessage(client, args);
                 case "send_chat" -> sendChat(client, args, false);
                 case "send_command" -> sendChat(client, args, true);
@@ -65,18 +66,17 @@ public final class ClientActionExecutor {
         }
     }
 
-    private static void simulateKey(MinecraftClient client, String args) {
+    private static void simulateKey(String args) {
         if (args == null || args.isBlank()) {
             return;
         }
-        String key = args.trim();
-        for (KeyBinding binding : client.options.allKeys) {
-            if (binding.getTranslationKey().equalsIgnoreCase(key)) {
-                binding.setPressed(true);
-                KeyBinding.onKeyPressed(binding.getBoundKey());
-                binding.setPressed(false);
-                return;
-            }
+        try {
+            InputUtil.Key key = InputUtil.fromTranslationKey(args.trim());
+            KeyBinding.setKeyPressed(key, true);
+            KeyBinding.onKeyPressed(key);
+            KeyBinding.setKeyPressed(key, false);
+        } catch (Throwable ignored) {
+            // Unknown translation key; ignore.
         }
     }
 
