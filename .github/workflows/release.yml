@@ -65,4 +65,7 @@ jobs:
           name: ${{ env.MOD_VERSION }}
           prerelease: false
           generate_release_notes: true
-          files: dist/*.jar
+          files: |
+            dist/*.jar
+            README.md
+            LICENSE
