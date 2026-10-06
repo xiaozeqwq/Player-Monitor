@@ -3,6 +3,7 @@ package com.xiaoze.playermonitor.server;
 import com.xiaoze.playermonitor.action.MonitorAction;
 import com.xiaoze.playermonitor.network.payload.ActionRequestPayload;
 import com.xiaoze.playermonitor.network.payload.GuiRequestPayload;
+import com.xiaoze.playermonitor.network.payload.MonitorActionPayload;
 import com.xiaoze.playermonitor.network.payload.OpenGuiPayload;
 import com.xiaoze.playermonitor.network.payload.ReportChunkPayload;
 import com.xiaoze.playermonitor.network.payload.ScreenshotChunkPayload;
