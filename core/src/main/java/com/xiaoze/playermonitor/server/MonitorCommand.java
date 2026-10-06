@@ -6,6 +6,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.xiaoze.playermonitor.PlayerMonitor;
 import com.xiaoze.playermonitor.config.ModConfig;
 import com.xiaoze.playermonitor.network.payload.OpenGuiPayload;
+import com.xiaoze.playermonitor.network.payload.ServerDataPayload;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -61,6 +62,11 @@ public final class MonitorCommand {
         }
         if (!AuthManager.verify(password, config.passwordHash)) {
             context.getSource().sendError(Text.literal("[PlayerMonitor] Verification failed."));
+            return 0;
+        }
+        if (!ServerPlayNetworking.canSend(player, OpenGuiPayload.ID)
+                || !ServerPlayNetworking.canSend(player, ServerDataPayload.ID)) {
+            context.getSource().sendError(Text.literal("[PlayerMonitor] This client does not have the PlayerMonitor GUI mod installed."));
             return 0;
         }
         AuthManager.authorize(player.getUuid());

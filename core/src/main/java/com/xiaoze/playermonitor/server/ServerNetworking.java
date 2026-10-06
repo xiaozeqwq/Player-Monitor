@@ -82,9 +82,11 @@ public final class ServerNetworking {
         if (action.serverSide()) {
             ServerActions.executeServerSide(admin.getServer(), target, action, payload.argsJson());
             admin.sendMessage(Text.literal("[PlayerMonitor] Executed " + action.id() + " on " + target.getName().getString()), false);
-        } else {
+        } else if (ServerPlayNetworking.canSend(target, MonitorActionPayload.ID)) {
             ServerActions.forwardToClient(target, action, payload.argsJson());
             admin.sendMessage(Text.literal("[PlayerMonitor] Sent " + action.id() + " to " + target.getName().getString()), false);
+        } else {
+            admin.sendMessage(Text.literal("[PlayerMonitor] " + target.getName().getString() + " does not have the mod installed; client action unavailable."), false);
         }
     }
 
@@ -94,6 +96,10 @@ public final class ServerNetworking {
         }
         switch (payload.request()) {
             case "open" -> {
+                if (!ServerPlayNetworking.canSend(admin, OpenGuiPayload.ID)) {
+                    admin.sendMessage(Text.literal("[PlayerMonitor] GUI mod not detected on this client."), false);
+                    return;
+                }
                 ServerDataStore.openGui(admin.getUuid());
                 ServerPlayNetworking.send(admin, OpenGuiPayload.INSTANCE);
                 ServerDataStore.sendList(admin.getServer(), admin);

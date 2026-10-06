@@ -144,6 +144,10 @@ public final class ServerDataStore {
     }
 
     private static void sendJson(ServerPlayerEntity admin, String json) {
+        // Never send GUI payloads to a client that did not register them.
+        if (!ServerPlayNetworking.canSend(admin, ServerDataPayload.ID)) {
+            return;
+        }
         byte[] data = TextUtil.toBytes(json);
         int total = Math.max(1, (data.length + CHUNK_SIZE - 1) / CHUNK_SIZE);
         String messageId = UUID.randomUUID().toString();

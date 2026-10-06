@@ -25,6 +25,12 @@ public class ModConfig {
     /** When true, remote actions are rejected unless the admin has verified. */
     public boolean requireAuthForActions = true;
 
+    /** When true, clients without the mod are rejected at join time. */
+    public boolean requireClientMod = true;
+
+    /** Message shown to a client that is kicked because the mod is missing. */
+    public String missingModMessage = "This server requires the Player Monitor mod. Please install playermonitor to join.";
+
     /** Send a fresh report automatically when a player joins. */
     public boolean reportOnJoin = true;
 

@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 import java.util.UUID;
 
@@ -17,7 +18,16 @@ public final class ServerLifecycle {
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity player = handler.player;
-            if (PlayerMonitor.config().reportOnJoin) {
+            boolean clientHasMod = ServerPlayNetworking.canSend(player, RequestReportPayload.ID);
+
+            // Enforce the mod requirement: clients without the mod are disconnected with a clear message.
+            if (PlayerMonitor.config().requireClientMod && !clientHasMod) {
+                player.networkHandler.disconnect(Text.literal(PlayerMonitor.config().missingModMessage));
+                return;
+            }
+
+            // Only ask clients that actually registered the payload.
+            if (PlayerMonitor.config().reportOnJoin && clientHasMod) {
                 server.execute(() -> ServerPlayNetworking.send(player, RequestReportPayload.INSTANCE));
             }
         });
