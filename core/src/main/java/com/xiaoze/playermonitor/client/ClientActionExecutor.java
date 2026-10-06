@@ -73,7 +73,7 @@ public final class ClientActionExecutor {
         for (KeyBinding binding : client.options.allKeys) {
             if (binding.getTranslationKey().equalsIgnoreCase(key)) {
                 binding.setPressed(true);
-                KeyBinding.onKeyPressed(binding);
+                KeyBinding.onKeyPressed(binding.getBoundKey());
                 binding.setPressed(false);
                 return;
             }
