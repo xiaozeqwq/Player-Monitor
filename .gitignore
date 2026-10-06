@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Loom / Minecraft run directories
+run/
+*/run/
+remappedSrc/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+eclipse/
+*.launch
+
+# OS
+.DS_Store

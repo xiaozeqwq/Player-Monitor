@@ -1,0 +1,72 @@
+name: Test
+
+# Builds development snapshots. Every push to a branch produces a Beta build that is
+# uploaded both as a workflow artifact and as a GitHub pre-release.
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Compute version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          YY=$(date +%y)
+          COUNT=$( (gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" -q '.[].tag_name' 2>/dev/null || true) | grep -c "^${YY}\." )
+          COUNT=${COUNT:-0}
+          BUILD=$((COUNT + 1))
+          echo "MOD_VERSION=${YY}.${BUILD}-Beta" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: gradle build -Pmod_version="$MOD_VERSION" --no-daemon
+
+      - name: Collect jars
+        run: |
+          mkdir -p dist
+          cp "core/build/libs/playermonitor-${MOD_VERSION}.jar" dist/
+          cp "gui/build/libs/playermonitor-${MOD_VERSION}-GUI.jar" dist/
+          ls -la dist
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: playermonitor-${{ env.MOD_VERSION }}
+          path: dist/*.jar
+          if-no-files-found: error
+
+      - name: Publish GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.MOD_VERSION }}
+          name: ${{ env.MOD_VERSION }}
+          prerelease: true
+          generate_release_notes: true
+          files: dist/*.jar

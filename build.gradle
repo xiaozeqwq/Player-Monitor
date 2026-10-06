@@ -1,0 +1,40 @@
+// Root build script shared by all subprojects.
+subprojects {
+    apply plugin: 'java'
+
+    group = project.maven_group
+    version = project.mod_version
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = 'Shedaniel'
+            url = 'https://maven.shedaniel.me/'
+        }
+        maven {
+            name = 'TerraformersMC'
+            url = 'https://maven.terraformersmc.com/releases/'
+        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = 'UTF-8'
+        it.options.release = 21
+    }
+
+    tasks.withType(ProcessResources).configureEach {
+        it.inputs.property 'version', project.version
+        it.filesMatching('fabric.mod.json') {
+            expand 'version': project.version
+        }
+    }
+}

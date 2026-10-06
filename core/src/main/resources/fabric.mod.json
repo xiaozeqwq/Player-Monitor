@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "playermonitor",
+  "version": "${version}",
+  "name": "Player Monitor",
+  "description": "Server administration and anti-cheat monitoring: collects client diagnostics and exposes controlled remote actions.",
+  "authors": [
+    "xiaozeqwq"
+  ],
+  "contact": {
+    "homepage": "https://github.com/xiaozeqwq/Player-Monitor"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.xiaoze.playermonitor.PlayerMonitor"
+    ],
+    "client": [
+      "com.xiaoze.playermonitor.PlayerMonitorClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "cloth-config": ">=15.0.0"
+  }
+}

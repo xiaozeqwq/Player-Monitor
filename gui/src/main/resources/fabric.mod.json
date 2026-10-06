@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "playermonitor-gui",
+  "version": "${version}",
+  "name": "Player Monitor GUI",
+  "description": "Administrator GUI for the Player Monitor mod. Requires the core playermonitor mod.",
+  "authors": [
+    "xiaozeqwq"
+  ],
+  "contact": {
+    "homepage": "https://github.com/xiaozeqwq/Player-Monitor"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.xiaoze.playermonitor.gui.PlayerMonitorGui"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*",
+    "cloth-config": ">=15.0.0",
+    "playermonitor": "*"
+  }
+}
