@@ -1,13 +1,9 @@
 name: Release and Update
 
-# Builds production releases. Trigger it by pushing a tag (for example 26.1-Release or
-# v26.1-Release) or manually through workflow_dispatch. Outputs are uploaded both as a
-# workflow artifact and as a full GitHub release.
+# Builds production releases. This workflow is manual-only (workflow_dispatch) so that
+# official releases are always intentional. Outputs are uploaded both as a workflow
+# artifact and as a full GitHub release.
 on:
-  push:
-    tags:
-      - 'v*'
-      - '[0-9]*'
   workflow_dispatch:
 
 permissions:
@@ -39,17 +35,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.ref_type }}" = "tag" ]; then
-            MOD_VERSION="${{ github.ref_name }}"
-            MOD_VERSION="${MOD_VERSION#v}"
-          else
-            YY=$(date +%y)
-            COUNT=$( (gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" -q '.[].tag_name' 2>/dev/null || true) | grep -c "^${YY}\." )
-            COUNT=${COUNT:-0}
-            BUILD=$((COUNT + 1))
-            MOD_VERSION="${YY}.${BUILD}-Release"
-          fi
-          echo "MOD_VERSION=${MOD_VERSION}" >> "$GITHUB_ENV"
+          YY=$(date +%y)
+          COUNT=$( (gh api --paginate "repos/${{ github.repository }}/releases?per_page=100" -q '.[].tag_name' 2>/dev/null || true) | grep -c "^${YY}\." || true )
+          COUNT=${COUNT:-0}
+          BUILD=$((COUNT + 1))
+          echo "MOD_VERSION=${YY}.${BUILD}-Release" >> "$GITHUB_ENV"
 
       - name: Build
         run: gradle build -Pmod_version="$MOD_VERSION" --no-daemon
