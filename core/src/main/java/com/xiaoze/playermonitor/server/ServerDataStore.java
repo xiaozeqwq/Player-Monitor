@@ -104,9 +104,11 @@ public final class ServerDataStore {
         root.addProperty("uuid", report.uuid().toString());
         root.addProperty("name", report.name());
         root.addProperty("updatedAt", report.updatedAt());
-        root.addProperty("report", GSON.toJsonTree(report.json()).isJsonObject()
-                ? GSON.fromJson(report.json(), JsonObject.class)
-                : GSON.toJsonTree(report.json()));
+        try {
+            root.add("report", GSON.fromJson(report.json(), JsonObject.class));
+        } catch (Exception e) {
+            root.addProperty("report", report.json());
+        }
         sendJson(admin, root.toString());
     }
 
